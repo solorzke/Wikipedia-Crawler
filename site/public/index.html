@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Focused Wikipedia Crawler</title>
+<meta name="description" content="A topical web crawler that walks Wikipedia collecting pages relevant to a topic — with a live in-browser demo and the archived 2018 crawl." />
+<link rel="preconnect" href="https://en.wikipedia.org" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%234dd0a7' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%234dd0a7'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">&#9678;</span>
+      <div>
+        <div class="brand-title">Focused Wikipedia Crawler</div>
+        <div class="brand-sub">topical / focused crawling &middot; BFS &middot; term-relevance filtering</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <nav class="tabs" role="tablist">
+        <button class="tab is-active" data-view="overview" role="tab">Overview</button>
+        <button class="tab" data-view="live" role="tab">Live crawler</button>
+        <button class="tab" data-view="archive" role="tab">2018 archive</button>
+      </nav>
+      <a class="gh-link" href="https://github.com/solorzke/WebCrawler" target="_blank" rel="noopener" aria-label="View source on GitHub" title="View source on GitHub">
+        <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ---------------------------------------------------------------- OVERVIEW -->
+  <section id="view-overview" class="view is-active">
+    <div class="hero">
+      <h1>A crawler that stays on topic.</h1>
+      <p class="lede">
+        Starting from a couple of seed articles, this crawler does a breadth-first
+        walk of Wikipedia's link graph. Before it keeps a page, it checks the page
+        text for a list of <em>related terms</em> &mdash; only pages that mention at
+        least two distinct terms are considered relevant to the topic and saved.
+      </p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" data-goto="live">Run a live crawl &rarr;</button>
+        <button class="btn" data-goto="archive">Browse the 2018 results</button>
+        <a class="btn btn-ghost" href="https://github.com/solorzke/WebCrawler" target="_blank" rel="noopener">Source on GitHub &nearr;</a>
+      </div>
+    </div>
+
+    <div class="stat-grid" id="overview-stats"><!-- filled by JS --></div>
+
+    <div class="panel">
+      <h2>How it works</h2>
+      <ol class="steps">
+        <li><strong>Seed the queue.</strong> Two starting articles go into a FIFO queue and a visited set.</li>
+        <li><strong>Fetch &amp; parse.</strong> Pop the next URL, download the HTML, extract the visible page text and every outgoing <code>/wiki/</code> link.</li>
+        <li><strong>Score relevance.</strong> Lower-case the page text and count how many of the related terms appear. Two or more distinct hits &rarr; the page is on-topic.</li>
+        <li><strong>Save on-topic pages.</strong> Relevant pages are written to the collection along with the terms that matched.</li>
+        <li><strong>Enqueue neighbours.</strong> Every valid, not-yet-seen outgoing link is appended to the queue.</li>
+        <li><strong>Repeat</strong> until the target page count is reached or the queue drains.</li>
+      </ol>
+      <p class="note">
+        Link filtering skips non-article namespaces (<code>Wikipedia:</code>,
+        <code>Special:</code>, <code>Talk:</code>, <code>Help:</code>,
+        <code>File:</code>, <code>Category:</code>, <code>Template:</code>,
+        <code>Portal:</code>, fragment links, and the Main Page).
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>The original run &mdash; <span id="topic-name">topic</span></h2>
+      <div class="cols">
+        <div>
+          <h3>Seed URLs</h3>
+          <ul class="plain" id="seed-list"></ul>
+          <h3>Relevance rule</h3>
+          <p>A page is kept when it contains <strong id="threshold-n">2</strong>+ distinct related terms (case-insensitive).</p>
+        </div>
+        <div>
+          <h3>Related terms</h3>
+          <div class="chips" id="term-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Term coverage in the 2018 crawl</h2>
+      <p class="note">How many of the 462 saved pages mention each term.</p>
+      <div class="bars" id="term-bars"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Reference implementation</h2>
+      <p>
+        The original crawler is a ~130-line Python script
+        (<code>web_crawler/crawler_doc/webcrawler.py</code>) using
+        <code>urllib</code> + <code>BeautifulSoup</code>. The live demo on this
+        site is a JavaScript re-implementation of the same algorithm that runs
+        entirely in your browser against the
+        <a href="https://www.mediawiki.org/wiki/API:Main_page" target="_blank" rel="noopener">MediaWiki API</a>
+        &mdash; no backend, which is what lets it host as a static site.
+      </p>
+      <pre class="code"><code>queue = [seed_one, seed_two]
+while queue and saved &lt; target:
+    page = fetch(queue.pop(0))
+    hits = {t for t in related_terms if t in page.text.lower()}
+    if len(hits) &gt;= 2:
+        save(page, matched=hits)
+    for link in page.outgoing_wiki_links:
+        if valid(link) and link not in visited:
+            queue.append(link); visited.add(link)</code></pre>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- LIVE -->
+  <section id="view-live" class="view">
+    <div class="panel">
+      <h2>Live crawl</h2>
+      <p class="note">
+        Runs in your browser against Wikipedia's API, one page at a time with a
+        polite delay. Great for a 15&ndash;40 page demo &mdash; not a full 500-page run.
+      </p>
+
+      <form id="crawl-form" class="form">
+        <div class="field">
+          <label for="f-seeds">Seed articles <span class="hint">one per line &mdash; title, /wiki/Title, or full URL</span></label>
+          <textarea id="f-seeds" rows="2" spellcheck="false">Video game
+Virtual reality</textarea>
+        </div>
+        <div class="field">
+          <label for="f-terms">Related terms <span class="hint">comma or newline separated</span></label>
+          <textarea id="f-terms" rows="2" spellcheck="false">gaming, xbox, playstation, console, nintendo, sega, atari, arcade, oculus, controller, cartridge, graphics</textarea>
+        </div>
+        <div class="row">
+          <div class="field sm">
+            <label for="f-threshold">Min term hits</label>
+            <input type="number" id="f-threshold" value="2" min="1" max="8" />
+          </div>
+          <div class="field sm">
+            <label for="f-max">Max pages to save</label>
+            <input type="number" id="f-max" value="25" min="3" max="60" />
+          </div>
+          <div class="field sm">
+            <label for="f-delay">Delay (ms)</label>
+            <input type="number" id="f-delay" value="450" min="200" max="3000" step="50" />
+          </div>
+          <div class="field sm">
+            <label for="f-fetchcap">Fetch budget</label>
+            <input type="number" id="f-fetchcap" value="200" min="20" max="600" step="10" />
+          </div>
+        </div>
+        <div class="hero-cta">
+          <button type="submit" class="btn btn-primary" id="btn-start">Start crawl</button>
+          <button type="button" class="btn" id="btn-pause" disabled>Pause</button>
+          <button type="button" class="btn btn-ghost" id="btn-reset" disabled>Reset</button>
+          <button type="button" class="btn btn-ghost" id="btn-preset">Load VR/games preset</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="stat-grid live-stats" id="live-stats">
+      <div class="stat"><div class="stat-n" id="s-fetched">0</div><div class="stat-l">fetched</div></div>
+      <div class="stat"><div class="stat-n" id="s-saved">0</div><div class="stat-l">saved</div></div>
+      <div class="stat"><div class="stat-n" id="s-skipped">0</div><div class="stat-l">off-topic</div></div>
+      <div class="stat"><div class="stat-n" id="s-queue">0</div><div class="stat-l">in queue</div></div>
+    </div>
+    <div class="progress"><div class="progress-bar" id="live-progress"></div></div>
+    <div class="status-line" id="live-status">Idle.</div>
+
+    <div class="split">
+      <div class="panel results-panel">
+        <h3>Saved pages <span class="counter" id="results-count">0</span></h3>
+        <div id="live-results" class="results"></div>
+      </div>
+      <div class="panel log-panel">
+        <h3>Crawl log</h3>
+        <div id="live-log" class="log"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- ARCHIVE -->
+  <section id="view-archive" class="view">
+    <div class="panel">
+      <h2>The 2018 crawl &mdash; <span id="a-topic">topic</span></h2>
+      <p class="note">
+        <span id="a-count">462</span> unique on-topic pages collected in a single
+        run from the two seed articles. Snippets and matched terms are extracted
+        from the saved HTML.
+      </p>
+      <div class="archive-controls">
+        <input type="search" id="a-search" placeholder="Search titles and snippets&hellip;" />
+        <select id="a-sort">
+          <option value="order">Crawl order</option>
+          <option value="title">Title A&ndash;Z</option>
+          <option value="terms-desc">Most terms matched</option>
+        </select>
+      </div>
+      <div class="chips filter-chips" id="a-term-filter"></div>
+    </div>
+    <div class="archive-meta" id="a-meta"></div>
+    <div id="archive-results" class="results"></div>
+    <div class="load-more"><button class="btn" id="a-more" hidden>Show more</button></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Kevin Solorzano &middot; IS-392 Assignment 2 (2018), rebuilt as a portfolio piece &middot; <a href="https://github.com/solorzke/WebCrawler" target="_blank" rel="noopener">github.com/solorzke/WebCrawler</a></span>
+    <span>Live demo uses the public MediaWiki API &middot; data cached from the original crawl</span>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="crawler.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

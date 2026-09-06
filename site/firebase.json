@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "site": "wiki-crawler",
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "build_index.py"],
+    "cleanUrls": true,
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "data/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+      }
+    ]
+  }
+}
