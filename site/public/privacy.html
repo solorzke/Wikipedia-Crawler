@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Consent Mode v2 bootstrap - must stay above every other script on the page. -->
+<script>
+(function () {
+  var ID = 'G-VECXVNTGME';
+  window.CMP_CONFIG = {
+    gaId: ID,
+    siteName: "this site",
+    theme: "dark",
+    accent: "#4dd0a7",
+    accentFg: "#06231a",
+    policyUrl: "/privacy"
+  };
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  window.gtag = gtag;
+
+  // Re-read a previous decision synchronously so returning visitors who opted
+  // in are not measured late, and everyone else starts fully denied.
+  var ok = false;
+  try {
+    var s = JSON.parse(localStorage.getItem('cmp_consent_v1'));
+    ok = !!(s && s.v === 1 && s.categories && s.categories.analytics);
+  } catch (e) {}
+
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    personalization_storage: 'denied',
+    analytics_storage: ok ? 'granted' : 'denied',
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+    wait_for_update: 500
+  });
+
+  gtag('js', new Date());
+  gtag('config', ID);
+
+  // gtag.js itself is withheld until consent exists; cmp.js injects it on opt-in.
+  if (ok) {
+    var t = document.createElement('script');
+    t.async = true;
+    t.src = 'https://www.googletagmanager.com/gtag/js?id=' + ID;
+    document.head.appendChild(t);
+  }
+})();
+</script>
+<script src="/cmp.js" defer></script>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — Focused Wikipedia Crawler</title>
+<meta name="description" content="What this site collects, why, and how to opt out. Analytics run only with consent." />
+<link rel="canonical" href="https://wiki-crawler.web.app/privacy" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%234dd0a7' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%234dd0a7'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .policy { max-width: 720px; padding-top: 40px; padding-bottom: 64px; }
+  .policy h1 { font-size: 1.9rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .policy .updated { color: var(--text-faint); font-size: 0.85rem; margin: 0 0 32px; }
+  .policy h2 { font-size: 1.05rem; margin: 36px 0 10px; color: var(--text); }
+  .policy p { margin: 0 0 12px; color: var(--text-dim); }
+  .policy ul { margin: 0 0 12px; padding-left: 20px; color: var(--text-dim); }
+  .policy li { margin-bottom: 6px; }
+  .policy .summary {
+    border-left: 2px solid var(--accent);
+    background: var(--bg-elev);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+  }
+  .policy .summary p { color: var(--text); margin: 0; }
+  .policy .back { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.9rem; }
+  /* also used by the footer, which sits outside .policy */
+  button.linkish {
+    background: none; border: 0; padding: 0; font: inherit;
+    color: var(--accent-2); text-decoration: underline; cursor: pointer;
+  }
+  button.linkish:hover { text-decoration: underline; opacity: 0.85; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">&#9678;</span>
+      <div>
+        <div class="brand-title">Focused Wikipedia Crawler</div>
+        <div class="brand-sub">topical / focused crawling &middot; BFS &middot; term-relevance filtering</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <a class="gh-link" href="https://github.com/solorzke/WebCrawler" target="_blank" rel="noopener" aria-label="View source on GitHub" title="View source on GitHub">
+        <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap policy">
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated 13 September 2026</p>
+
+  <div class="summary">
+    <p>
+      Short version: this site runs Google Analytics and nothing else. It stays switched off
+      until you press Accept, and you can switch it back off at any time from the
+      <button type="button" data-cmp-open class="linkish">cookie settings</button> link in the
+      footer. There are no ads and no advertising trackers. One thing worth knowing up front:
+      the live crawler demo talks to Wikipedia directly from your browser, so Wikipedia sees
+      those requests. That is explained below.
+    </p>
+  </div>
+
+  <h2>Who runs this site</h2>
+  <p>
+    This site is operated personally by Kevin Solorzano in West Orange, New Jersey, USA. It is a
+    portfolio piece built around a 2018 university assignment, not a commercial service. For
+    anything in this policy, including requests about your data, write to
+    <a href="mailto:solorzke@gmail.com">solorzke@gmail.com</a>.
+  </p>
+
+  <h2>What is collected</h2>
+  <p>
+    Only Google Analytics 4, and only after you consent. If you decline, or simply ignore the
+    banner, no analytics code loads at all and no cookies are written.
+  </p>
+  <p>When analytics is enabled, two cookies are stored in your browser:</p>
+  <ul>
+    <li><code>_ga</code> &mdash; a randomly generated visitor ID. Expires after 2 years.</li>
+    <li><code>_ga_VECXVNTGME</code> &mdash; session state for this property. Expires after 2 years.</li>
+  </ul>
+  <p>And the following is sent to Google:</p>
+  <ul>
+    <li>The page address you are viewing and the page that referred you.</li>
+    <li>An approximate location derived from your IP address. Google Analytics 4 does not log or store the IP address itself.</li>
+    <li>Device and browser type, screen size, and language.</li>
+  </ul>
+  <p>
+    This site has no accounts, no forms and no sign-up. It never asks for your name or email.
+  </p>
+
+  <h2>The live crawler demo</h2>
+  <p>
+    The <strong>Live crawler</strong> tab runs entirely in your browser. When you start a crawl,
+    your browser requests pages from Wikipedia's public MediaWiki API directly. Those requests
+    go from you to Wikipedia, not through any server of mine, which means the
+    <a href="https://foundation.wikimedia.org/wiki/Policy:Privacy_policy" target="_blank" rel="noopener">Wikimedia Foundation</a>
+    receives your IP address and the articles you fetched, under their own privacy policy.
+  </p>
+  <p>
+    I never see the results of your crawl, and nothing from it is stored or transmitted anywhere
+    else. It exists and disappears in your browser tab. This behaviour is not covered by the
+    cookie banner because it only happens when you deliberately press the button to start a
+    crawl, and it sets no cookies.
+  </p>
+  <p>
+    The <strong>2018 archive</strong> tab is different: it reads a static JSON file served from
+    this site and makes no external requests at all.
+  </p>
+
+  <h2>Why</h2>
+  <p>
+    To see roughly how many people visit and whether anyone tries the demo. That is the whole
+    purpose. The data is not used to build a profile of you, is never used for advertising, and
+    is never sold or shared.
+  </p>
+  <p>
+    Google's advertising features are explicitly switched off on this property:
+    <code>ad_storage</code>, <code>ad_user_data</code>, <code>ad_personalization</code> and
+    <code>personalization_storage</code> are denied at all times, whether or not you consent to
+    analytics.
+  </p>
+
+  <h2>Legal basis and your rights</h2>
+  <p>
+    Where the GDPR or UK GDPR applies, the legal basis for this processing is your consent,
+    given by pressing Accept. You can withdraw it at any moment with the cookie settings link,
+    which also deletes the analytics cookies from your browser. Withdrawing is as easy as giving
+    consent and carries no penalty.
+  </p>
+  <p>
+    Depending on where you live, you may have the right to access the data held about you, to
+    have it corrected or deleted, to object to processing, or to receive a copy. Under the CCPA
+    and CPRA, California residents additionally have the right to know what is collected and to
+    opt out of any sale or sharing of personal information. No personal information is sold or
+    shared, so there is nothing to opt out of, but the analytics opt-out is available to everyone
+    regardless.
+  </p>
+  <p>
+    To exercise any of these, email <a href="mailto:solorzke@gmail.com">solorzke@gmail.com</a>.
+    Because the analytics data is not tied to a name or an email address, you may need to tell me
+    roughly when you visited so the right records can be found.
+  </p>
+
+  <h2>Who else sees it</h2>
+  <p>
+    Google, as the analytics provider, acting as a processor on my behalf. Their handling is
+    governed by the
+    <a href="https://business.safety.google/privacy/" target="_blank" rel="noopener">Google Privacy &amp; Terms</a>
+    and the
+    <a href="https://business.safety.google/adsprocessorterms/" target="_blank" rel="noopener">Google Ads Data Processing Terms</a>.
+    Google may process this data on servers in the United States.
+  </p>
+  <p>
+    The Wikimedia Foundation, but only for the live crawler demo, and only when you start one,
+    as described above.
+  </p>
+  <p>
+    The site is hosted on Firebase Hosting, also a Google service. Like any web server, it keeps
+    standard request logs for security and reliability.
+  </p>
+  <p>
+    Nobody else. No advertising networks, no data brokers, no social media pixels, no session
+    recording, no heatmaps.
+  </p>
+
+  <h2>How long it is kept</h2>
+  <p>
+    Analytics records are retained for 14 months and then deleted automatically by Google. The
+    cookies in your browser expire after 2 years, or immediately if you withdraw consent or clear
+    your browser data.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    This site is a technical portfolio piece aimed at employers and other developers. It is not
+    directed at children under 13 and does not knowingly collect anything from them.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If this policy changes materially, the date at the top will change with it. If the change
+    affects what is collected, the consent banner will reappear so you can make a fresh choice.
+  </p>
+
+  <h2>Opting out elsewhere</h2>
+  <p>
+    Besides the cookie settings on this site, you can install Google's
+    <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Analytics Opt-out Browser Add-on</a>,
+    which blocks Google Analytics across every site you visit. Most browsers also let you block
+    or clear cookies directly.
+  </p>
+
+  <p class="back"><a href="/">&larr; back to the crawler</a></p>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Kevin Solorzano &middot; IS-392 Assignment 2 (2018), rebuilt as a portfolio piece &middot; <a href="https://github.com/solorzke/WebCrawler" target="_blank" rel="noopener">github.com/solorzke/WebCrawler</a></span>
+    <span><a href="/privacy">Privacy</a> &middot; <button type="button" data-cmp-open class="linkish">Cookie settings</button></span>
+  </div>
+</footer>
+</body>
+</html>
